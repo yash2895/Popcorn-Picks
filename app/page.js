@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { cardClick } from "./actions/cardClick";
 import Imagewithfallback from "@/components/Imagewithfallback";
-
+import { ToastContainer, toast } from "react-toastify";
 export default function Home() {
   const [search, setSearch] = useState("");
   const [moviesList, setMoviesList] = useState(null);
@@ -27,6 +27,17 @@ export default function Home() {
       });
 
     if (!data.success) {
+      setMoviesList(null);
+      toast.error(data.error, {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } else {
       setMoviesList(data.data);
       setCurrentPage(pageno);
@@ -84,52 +95,64 @@ export default function Home() {
   };
   return (
     <div className="">
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <div className="    max-w-screen-2xl mx-auto ">
         <div className="searchArea flex flex-col items-center gap-3 p-10">
-          <Image width={400} height={400} src="/logo.png" alt="Logo"/>
-          <div className="w-4/6" >
-          <label
-            htmlFor="search"
-            className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-          >
-            Search
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              id="search"
-              className="block w-full p-2 ps-10 text-lg  text-gray-900 border border-gray-300 rounded-lg bg-gray-300 focus:ring-violet-600 focus:border-violet-600   outline-none"
-              placeholder="Search"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-              required
-            />
-            <button
-              className="text-white absolute end-2.5 bottom-1 bg-violet-600 hover:bg-violet-600 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-4 py-2 "
-            onClick={handleSearch}
+          <Image width={400} height={400} src="/logo.png" alt="Logo" />
+          <div className="w-4/6">
+            <label
+              htmlFor="search"
+              className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
             >
               Search
-            </button>
-          </div>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="search"
+                className="block w-full p-2 ps-10 text-lg  text-gray-900 border border-gray-300 rounded-lg bg-gray-300 focus:ring-violet-600 focus:border-violet-600   outline-none"
+                placeholder="Search"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
+                required
+              />
+              <button
+                className="text-white absolute end-2.5 bottom-1 bg-violet-600 hover:bg-violet-600 focus:ring-4 focus:outline-none focus:ring-violet-300 font-medium rounded-lg text-sm px-4 py-2 "
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+            </div>
           </div>
         </div>
         {pages.current != null && pages.current.length != 0 && (
@@ -150,12 +173,16 @@ export default function Home() {
                     className="cursor-pointer rounded-full flex justify-center items-center w-10 h-10 "
                     key={uuidv4()}
                     ref={item == currentPage ? currentRef : null}
-                    onClick={item!="..."?(e) => {
-                      handleSearch(
-                        e,
-                        e.currentTarget.getAttribute("data-page"),
-                      );
-                    }:null}
+                    onClick={
+                      item != "..."
+                        ? (e) => {
+                            handleSearch(
+                              e,
+                              e.currentTarget.getAttribute("data-page"),
+                            );
+                          }
+                        : null
+                    }
                     data-page={item}
                   >
                     {item}
